@@ -1,0 +1,8 @@
+# Ignore compiled output
+hsh
+
+# Ignore object files
+*.o
+
+# Ignore hidden source files
+.*.c
