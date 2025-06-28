@@ -1,49 +1,45 @@
-c
-CopyEdit
 #include "shell.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/wait.h>
-#include <string.h>
 
-#define PROMPT "($) "
-
+/**
+ * main - Entry point for simple shell
+ *
+ * Return: Always 0 (Success)
+ */
 int main(void)
 {
-    char *line = NULL;
-    size_t len = 0;
-    ssize_t nread;
-    pid_t pid;
-    int status;
+	char *line = NULL;
+	size_t len = 0;
+	ssize_t read;
 
-    while (1)
-    {
-        write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
-        nread = getline(&line, &len, stdin);
-        if (nread == -1)  /* EOF */
-        {
-            free(line);
-            exit(0);
-        }
+	while (1)
+	{
+		printf("$ ");
+		fflush(stdout);
 
-        /* strip newline */
-        if (line[nread - 1] == '\n')
-            line[nread - 1] = '\0';
+		read = getline(&line, &len, stdin);
+		if (read == -1)
+		{
+			/* Handle Ctrl+D (EOF) */
+			printf("\n");
+			break;
+		}
 
-        pid = fork();
-        if (pid == 0)    /* child */
-        {
-            char *args[] = { line, NULL };
-            execve(args[0], args, environ);
-            perror("hsh");  /* execve failed */
-            exit(1);
-        }
-        else if (pid > 0)  /* parent */
-            wait(&status);
-        else
-            perror("hsh");
-    }
+		/* Remove newline character */
+		if (line[read - 1] == '\n')
+			line[read - 1] = '\0';
 
-    return (0);
+		/* Skip empty lines */
+		if (line[0] == '\0')
+			continue;
+
+		/* Check for exit command */
+		if (_strcmp(line, "exit") == 0)
+			break;
+
+		/* Execute the command */
+		execute_command(line);
+	}
+
+	free(line);
+	return (0);
 }
