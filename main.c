@@ -13,14 +13,18 @@ int main(void)
 
 	while (1)
 	{
-		printf("$ ");
-		fflush(stdout);
+		/* Print prompt only if stdin is a terminal */
+		if (isatty(STDIN_FILENO))
+		{
+			write(STDOUT_FILENO, "$ ", 2);
+		}
 
 		read = getline(&line, &len, stdin);
 		if (read == -1)
 		{
 			/* Handle Ctrl+D (EOF) */
-			printf("\n");
+			if (isatty(STDIN_FILENO))
+				write(STDOUT_FILENO, "\n", 1);
 			break;
 		}
 
