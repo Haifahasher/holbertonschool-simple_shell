@@ -1,6 +1,24 @@
 #include "shell.h"
 
 /**
+ * free_args - Free memory allocated for arguments array
+ * @args: Array of strings to free
+ *
+ * Description: Frees each string in the array and then the array itself
+ */
+void free_args(char **args)
+{
+	int i;
+
+	if (args == NULL)
+		return;
+
+	for (i = 0; args[i] != NULL; i++)
+		free(args[i]);
+	free(args);
+}
+
+/**
  * execute_command - Execute a command using fork and execve
  * @args: Array of command and arguments
  *
