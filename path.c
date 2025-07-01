@@ -11,8 +11,13 @@ char *find_path(char *command)
 	struct stat st;
 	int len, i = 0;
 
-	if (stat(command, &st) == 0)
-		return (command);
+	if (strchr(command, '/'))
+	{
+		if (stat(command, &st) == 0)
+			return (command);
+		else
+			return (NULL);
+	}
 
 	while (environ[i])
 	{
