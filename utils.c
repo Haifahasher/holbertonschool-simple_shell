@@ -13,10 +13,16 @@ char **tokenize(char *line)
 {
 	char **tokens;
 	char *token;
+	char *line_copy; /* Copy of the line to handle strtok */
 	int position = 0;
 	int bufsize = MAX_ARGS;
 
 	if (line == NULL)
+		return (NULL);
+
+	/* Create a copy of the line since strtok modifies the original string */
+	line_copy = _strdup(line);
+	if (line_copy == NULL)
 		return (NULL);
 
 	/* Allocate memory for tokens array */
@@ -24,15 +30,26 @@ char **tokenize(char *line)
 	if (tokens == NULL)
 	{
 		perror("malloc");
+		free(line_copy);
 		return (NULL);
 	}
 
 	/* Get the first token */
-	token = strtok(line, DELIM);
+	token = strtok(line_copy, DELIM);
 	while (token != NULL)
 	{
-		/* Store the token */
-		tokens[position] = token;
+		/* Store a copy of the token */
+		tokens[position] = _strdup(token);
+		if (tokens[position] == NULL)
+		{
+			/* Free previously allocated memory on failure */
+			int i;
+			for (i = 0; i < position; i++)
+				free(tokens[i]);
+			free(tokens);
+			free(line_copy);
+			return (NULL);
+		}
 		position++;
 
 		/* Check if we need to reallocate */
@@ -43,6 +60,7 @@ char **tokenize(char *line)
 			if (tokens == NULL)
 			{
 				perror("realloc");
+				free(line_copy);
 				return (NULL);
 			}
 		}
@@ -53,6 +71,7 @@ char **tokenize(char *line)
 
 	/* Null-terminate the array */
 	tokens[position] = NULL;
+	free(line_copy); /* Free the temporary copy */
 	return (tokens);
 }
 
