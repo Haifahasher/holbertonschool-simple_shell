@@ -66,7 +66,7 @@ int execute(char **args, char *argv0, int line_count)
 	if (!cmd)
 	{
 		fprintf(stderr, "%s: %d: %s: not found\n", argv0, line_count, args[0]);
-		return (1);
+		return (127);
 	}
 	pid = fork();
 	if (pid == 0)

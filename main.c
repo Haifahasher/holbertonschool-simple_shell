@@ -37,6 +37,8 @@ int main(int ac, char **av)
 		status = execute(args, av[0], line_count);
 		free(line);
 		free(args);
+		if (status != 1)
+			return (status);
 	}
 	return (0);
-} 
+}
