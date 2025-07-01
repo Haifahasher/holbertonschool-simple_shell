@@ -10,6 +10,8 @@ int main(void)
 	char *line = NULL;
 	size_t len = 0;
 	ssize_t read;
+	char **args;
+	int status = 0;
 
 	while (1)
 	{
@@ -32,18 +34,33 @@ int main(void)
 		if (line[read - 1] == '\n')
 			line[read - 1] = '\0';
 
-		/* Skip empty lines */
-		if (line[0] == '\0')
+		/* Trim spaces from the line */
+		line = trim_spaces(line);
+
+		/* Skip empty lines or lines with only spaces */
+		if (line == NULL || line[0] == '\0')
 			continue;
 
+		/* Tokenize the input into command and arguments */
+		args = tokenize(line);
+		if (args == NULL || args[0] == NULL)
+		{
+			free(args);
+			continue;
+		}
+
 		/* Check for exit command */
-		if (_strcmp(line, "exit") == 0)
+		if (_strcmp(args[0], "exit") == 0)
+		{
+			free(args);
 			break;
+		}
 
 		/* Execute the command */
-		execute_command(line);
+		status = execute_command(args);
+		free(args);
 	}
 
 	free(line);
-	return (0);
+	return (status);
 }
