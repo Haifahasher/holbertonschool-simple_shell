@@ -2,41 +2,53 @@
 
 /**
  * execute_command - Execute a command using fork and execve
- * @command: The command to execute
+ * @args: Array of command and arguments
  *
  * Description: This function creates a child process to execute
- * the given command. It handles errors and waits for child completion.
+ * the given command with its arguments.
+ * 
+ * Return: Exit status of the command
  */
-void execute_command(char *command)
+int execute_command(char **args)
 {
 	pid_t pid;
 	int status;
-	char *argv[2];
 
-	/* Prepare arguments for execve */
-	argv[0] = command;
-	argv[1] = NULL;
+	if (args == NULL || args[0] == NULL)
+		return (-1);
 
 	pid = fork();
 	if (pid == -1)
 	{
 		perror("fork");
-		return;
+		return (-1);
 	}
 	else if (pid == 0)
 	{
 		/* Child process */
-		if (execve(command, argv, environ) == -1)
+		if (execve(args[0], args, environ) == -1)
 		{
-			perror(command);
+			perror(args[0]);
 			exit(127);
 		}
 	}
 	else
 	{
 		/* Parent process */
-		wait(&status);
+		if (wait(&status) == -1)
+		{
+			perror("wait");
+			return (-1);
+		}
+		
+		/* Return the exit status of the child */
+		if (WIFEXITED(status))
+			return (WEXITSTATUS(status));
+		else if (WIFSIGNALED(status))
+			return (128 + WTERMSIG(status));
 	}
+
+	return (0);
 }
 
 /**
