@@ -22,6 +22,7 @@ extern char **environ;
 /* Main execution functions */
 int execute_command(char **args);
 void print_error(char *program, char *command);
+void free_args(char **args);
 
 /* Utility functions */
 char **tokenize(char *line);
