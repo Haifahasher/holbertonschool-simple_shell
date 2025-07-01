@@ -1,4 +1,5 @@
 #ifndef SHELL_H
+
 #define SHELL_H
 
 /* Standard libraries */
@@ -30,5 +31,7 @@ char *trim_spaces(char *str);
 int _strcmp(char *s1, char *s2);
 char *_strdup(char *str);
 int _strlen(char *s);
+char *find_in_path(char *cmd);
+void  print_environ(void);
 
 #endif /* SHELL_H */
