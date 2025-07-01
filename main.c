@@ -1,67 +1,42 @@
 #include "shell.h"
 
 /**
- * main - Entry point for simple shell
+ * main - Entry point for the shell
+ * @ac: Argument count
+ * @av: Argument vector
  *
- * Return: Always 0 (Success)
+ * Return: 0 on success, otherwise 1
  */
-int main(void)
+int main(int ac, char **av)
 {
-	char *line = NULL;
-	size_t len = 0;
-	ssize_t read;
-	char **args;
-	int status = 0;
-	char *trimmed_line; /* New variable for line after trimming */
+	char *line = NULL, **args = NULL;
+	int status = 1, line_count = 0;
+	(void)ac;
 
-	while (1)
+	while (status)
 	{
-		/* Print prompt only if stdin is a terminal */
 		if (isatty(STDIN_FILENO))
-		{
-			write(STDOUT_FILENO, "$ ", 2);
-		}
-
-		read = getline(&line, &len, stdin);
-		if (read == -1)
-		{
-			/* Handle Ctrl+D (EOF) */
-			if (isatty(STDIN_FILENO))
-				write(STDOUT_FILENO, "\n", 1);
+			prompt();
+		line = read_line();
+		if (!line)
 			break;
-		}
-
-		/* Remove newline character */
-		if (line[read - 1] == '\n')
-			line[read - 1] = '\0';
-
-		/* Trim spaces from the line - keep original pointer */
-		trimmed_line = trim_spaces(line);
-
-		/* Skip empty lines or lines with only spaces */
-		if (trimmed_line == NULL || trimmed_line[0] == '\0')
-			continue;
-
-		/* Tokenize the input into command and arguments */
-		args = tokenize(trimmed_line);
-		if (args == NULL || args[0] == NULL)
+		line_count++;
+		args = split_line(line);
+		if (!args || !args[0])
 		{
-			free_args(args);
+			free(line);
+			free(args);
 			continue;
 		}
-
-		/* Check for exit command */
-		if (_strcmp(args[0], "exit") == 0)
+		if (handle_builtin(args))
 		{
-			free_args(args);
-			break;
+			free(line);
+			free(args);
+			continue;
 		}
-
-		/* Execute the command */
-		status = execute_command(args);
-		free_args(args); /* Use dedicated function to free memory */
+		status = execute(args, av[0], line_count);
+		free(line);
+		free(args);
 	}
-
-	free(line); /* Free only the original pointer */
-	return (status);
-}
+	return (0);
+} 
