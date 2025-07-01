@@ -10,16 +10,22 @@
 #include <sys/types.h>
 #include <errno.h>
 
+/* Constants */
+#define MAX_ARGS 64
+#define DELIM " \t\r\n\a"
+
 /* External variable for environment */
 extern char **environ;
 
 /* Function prototypes */
 
 /* Main execution functions */
-void execute_command(char *command);
+int execute_command(char **args);
 void print_error(char *program, char *command);
 
 /* Utility functions */
+char **tokenize(char *line);
+char *trim_spaces(char *str);
 int _strcmp(char *s1, char *s2);
 char *_strdup(char *str);
 int _strlen(char *s);
