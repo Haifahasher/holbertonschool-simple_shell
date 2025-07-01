@@ -12,6 +12,7 @@ int main(void)
 	ssize_t read;
 	char **args;
 	int status = 0;
+	char *trimmed_line; /* New variable for line after trimming */
 
 	while (1)
 	{
@@ -34,33 +35,33 @@ int main(void)
 		if (line[read - 1] == '\n')
 			line[read - 1] = '\0';
 
-		/* Trim spaces from the line */
-		line = trim_spaces(line);
+		/* Trim spaces from the line - keep original pointer */
+		trimmed_line = trim_spaces(line);
 
 		/* Skip empty lines or lines with only spaces */
-		if (line == NULL || line[0] == '\0')
+		if (trimmed_line == NULL || trimmed_line[0] == '\0')
 			continue;
 
 		/* Tokenize the input into command and arguments */
-		args = tokenize(line);
+		args = tokenize(trimmed_line);
 		if (args == NULL || args[0] == NULL)
 		{
-			free(args);
+			free_args(args);
 			continue;
 		}
 
 		/* Check for exit command */
 		if (_strcmp(args[0], "exit") == 0)
 		{
-			free(args);
+			free_args(args);
 			break;
 		}
 
 		/* Execute the command */
 		status = execute_command(args);
-		free(args);
+		free_args(args); /* Use dedicated function to free memory */
 	}
 
-	free(line);
+	free(line); /* Free only the original pointer */
 	return (status);
 }
