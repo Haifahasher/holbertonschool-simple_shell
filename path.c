@@ -7,15 +7,25 @@
  */
 char *find_path(char *command)
 {
-	char *path, *path_cpy, *dir, *full_path;
+	char *path = NULL, *path_cpy, *dir, *full_path;
 	struct stat st;
-	int len;
+	int len, i = 0;
 
 	if (stat(command, &st) == 0)
 		return (command);
-	path = getenv("PATH");
+
+	while (environ[i])
+	{
+		if (strncmp(environ[i], "PATH=", 5) == 0)
+		{
+			path = environ[i] + 5;
+			break;
+		}
+		i++;
+	}
 	if (!path)
 		return (NULL);
+
 	path_cpy = strdup(path);
 	dir = strtok(path_cpy, ":");
 	while (dir)
