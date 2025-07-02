@@ -28,10 +28,14 @@ int main(int ac, char **av)
 			free(args);
 			continue;
 		}
-		if (handle_builtin(args))
+		int builtin_status = handle_builtin(args);
+
+		if (builtin_status)
 		{
 			free(line);
 			free(args);
+			if (builtin_status == -1)
+				exit(0);
 			continue;
 		}
 		status = execute(args, av[0], line_count);
