@@ -1,35 +1,17 @@
 #include "shell.h"
 
 /**
- * find_path - Finds the full path of a command
- * @command: The command to find
- * Return: Full path (malloc'd) or command if found as is
+ * search_path_dirs - Searches PATH directories for a command
+ * @path: PATH string
+ * @command: Command to find
+ *
+ * Return: malloc'd full path if found, NULL otherwise
  */
-char *find_path(char *command)
+char *search_path_dirs(char *path, char *command)
 {
-	char *path = NULL, *path_cpy, *dir, *full_path;
+	char *path_cpy, *dir, *full_path;
 	struct stat st;
-	int len, i = 0;
-
-	if (strchr(command, '/'))
-	{
-		if (stat(command, &st) == 0)
-			return (command);
-		else
-			return (NULL);
-	}
-
-	while (environ[i])
-	{
-		if (strncmp(environ[i], "PATH=", 5) == 0)
-		{
-			path = environ[i] + 5;
-			break;
-		}
-		i++;
-	}
-	if (!path)
-		return (NULL);
+	int len;
 
 	path_cpy = strdup(path);
 	dir = strtok(path_cpy, ":");
@@ -53,4 +35,39 @@ char *find_path(char *command)
 	}
 	free(path_cpy);
 	return (NULL);
+}
+
+/**
+ * find_path - Finds the full path of a command
+ * @command: The command to find
+ *
+ * Return: Full path (malloc'd) or command if found as is
+ */
+char *find_path(char *command)
+{
+	char *path = NULL;
+	struct stat st;
+	int i = 0;
+
+	if (strchr(command, '/'))
+	{
+		if (stat(command, &st) == 0)
+			return (command);
+		else
+			return (NULL);
+	}
+
+	while (environ[i])
+	{
+		if (strncmp(environ[i], "PATH=", 5) == 0)
+		{
+			path = environ[i] + 5;
+			break;
+		}
+		i++;
+	}
+	if (!path)
+		return (NULL);
+
+	return (search_path_dirs(path, command));
 }
