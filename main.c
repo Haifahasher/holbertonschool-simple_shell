@@ -10,7 +10,7 @@
 int main(int ac, char **av)
 {
 	char *line = NULL, **args = NULL;
-	int status = 1, line_count = 0;
+	int status = 1, line_count = 0, last_status = 0;
 	(void)ac;
 
 	while (status)
@@ -37,10 +37,11 @@ int main(int ac, char **av)
 			free(line);
 			free(args);
 			if (builtin_status == -1)
-				exit(0);
+				exit(last_status);
 			continue;
 		}
 		status = execute(args, av[0], line_count);
+		last_status = status;
 		free(line);
 		free(args);
 		if (status != 1)
