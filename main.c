@@ -15,6 +15,8 @@ int main(int ac, char **av)
 
 	while (status)
 	{
+		int builtin_status;
+
 		if (isatty(STDIN_FILENO))
 			prompt();
 		line = read_line();
@@ -28,7 +30,7 @@ int main(int ac, char **av)
 			free(args);
 			continue;
 		}
-		int builtin_status = handle_builtin(args);
+		builtin_status = handle_builtin(args);
 
 		if (builtin_status)
 		{
