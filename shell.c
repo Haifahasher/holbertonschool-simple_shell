@@ -1,14 +1,6 @@
 #include "shell.h"
 
 /**
- * prompt - Displays the shell prompt
- */
-void prompt(void)
-{
-	write(STDOUT_FILENO, "$ ", 2);
-}
-
-/**
  * read_line - Reads a line from stdin
  * Return: Pointer to the line, or NULL on EOF
  */
