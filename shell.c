@@ -1,6 +1,14 @@
 #include "shell.h"
 
 /**
+ * prompt - Displays the shell prompt
+ */
+void prompt(void)
+{
+	write(STDOUT_FILENO, "$ ", 2);
+}
+
+/**
  * read_line - Reads a line from stdin
  * Return: Pointer to the line, or NULL on EOF
  */
@@ -78,12 +86,18 @@ int execute(char **args, char *argv0, int line_count)
 	else if (pid < 0)
 	{
 		perror("fork");
+		if (cmd != args[0])
+			free(cmd);
+		return (1);
 	}
 	else
 	{
 		waitpid(pid, &status, 0);
+		if (cmd != args[0])
+			free(cmd);
+		if (WIFEXITED(status))
+			return (WEXITSTATUS(status));
+		else
+			return (1);
 	}
-	if (cmd != args[0])
-		free(cmd);
-	return (1);
 }
